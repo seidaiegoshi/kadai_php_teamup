@@ -1,39 +1,48 @@
 <?php
+// var_dump($_POST);
 
-// var_dump($_POST["fileName"]);
-
+$file_name = $_POST["fileName"];
+$file_path  = "./data/" . $file_name;
+$user_name = $_POST['userName'];
 $htmlElement = "";
-$fileName = $_GET["fileName"];
-// $write_data = "{$_POST['test']}";
 
+if (isset($_POST["text"])) {
+  // $_POST["text"]があるか
+  if ($_POST["text"] != "") {
+    // $_POST["text"]があったとき、空かどうか
+    $json =
+      json_decode(file_get_contents($file_path), true);
+    //テキストがあったら書き込みを行う
+
+    $add_obj = ["name" => $_POST["userName"], "text" => $_POST["text"]];
+    // var_dump($add_obj);
+    array_push($json["chat"], $add_obj);
+
+    $file = fopen($file_path, "r+");
+    flock($file, LOCK_EX);
+    file_put_contents($file_path, '');
+
+    fwrite($file, json_encode($json));
+    flock($file, LOCK_UN);
+    fclose($file);
+  }
+}
+
+// テキストがなかったら読み込みだけを行う。
 $json =
-  json_decode(file_get_contents("./data/" . $fileName), true);
-// echo '<pre>';
-// var_dump($json);
-// echo '</pre>';
+  json_decode(file_get_contents($file_path), true);
 
 $chat_hist = $json["chat"];
 // echo '<pre>';
-// var_dump(json_encode($chat_hist));
+// var_dump($json["chat"]);
 // echo '</pre>';
 
 foreach ($chat_hist as $key => $value) {
   $htmlElement .= "
-  <li>
-    <span class='name'>{$value["name"]}</span>
-    <span class='text'>{$value["text"]}</span>
-  </li>";
-}
-// $file = fopen($fileName, "r");
-// flock($file, LOCK_EX);
-
-// fwrite($file, json_encode($text));
-// flock($file, LOCK_UN);
-// fclose($file);
-
-$user_name = "";
-if (isset($_GET["userName"])) {
-  $user_name = $_GET["userName"];
+        <li>
+          <span class='name'>{$value["name"]}</span>
+          <span class='text'>{$value["text"]}</span>
+        </li>";
 }
 
 
@@ -59,10 +68,10 @@ if (isset($_GET["userName"])) {
       <?= $htmlElement ?>
     </ul>
   </div>
-  <form action="./chat_write.php" method="POST">
-    <input type="text" name="fileName" value="<?= $fileName ?>" hidden>
-    <input type="text" name="name" value='<?= $user_name ?>'>
-    <input type="text" name="text">
+  <form action="./chat_room.php" method="POST">
+    <input type="text" name="fileName" value="<?= $file_name ?>" hidden>
+    <input type="text" name="userName" value='<?= $user_name ?>'>
+    <input type="text" name="text" value="">
     <input type="submit" value="Send">
   </form>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
