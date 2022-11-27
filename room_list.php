@@ -41,8 +41,10 @@ if ($room_files) {
 
 <body>
   <div>
+    <a href="./create_chat_room.php">新規作成</a>
+  </div>
+  <div>
     <ul><?= $htmlElement ?></ul>
-
   </div>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </body>
