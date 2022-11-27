@@ -5,6 +5,7 @@ $file_name = $_POST["fileName"];
 $file_path  = "./data/" . $file_name;
 $user_name = $_POST['userName'];
 $htmlElement = "";
+$personality = $_POST['personality'];
 
 if (isset($_POST["text"])) {
   // $_POST["text"]があるか
@@ -12,8 +13,8 @@ if (isset($_POST["text"])) {
     // $_POST["text"]があったとき、空かどうか
     $json =
       json_decode(file_get_contents($file_path), true);
-    //テキストがあったら書き込みを行う
 
+    $json[$personality] = $user_name;
     $add_obj = ["name" => $_POST["userName"], "text" => $_POST["text"]];
     // var_dump($add_obj);
     array_push($json["chat"], $add_obj);
@@ -28,14 +29,31 @@ if (isset($_POST["text"])) {
   }
 }
 
+
+
 // テキストがなかったら読み込みだけを行う。
 $json =
   json_decode(file_get_contents($file_path), true);
+
+
 
 $chat_hist = $json["chat"];
 // echo '<pre>';
 // var_dump($json["chat"]);
 // echo '</pre>';
+
+
+//初回表示で$json[$personality]が空だったら、入力
+if ($json[$personality] = "") {
+  $json[$personality] = $personality;
+  $file = fopen($file_path, "r+");
+  flock($file, LOCK_EX);
+  file_put_contents($file_path, '');
+
+  fwrite($file, json_encode($json));
+  flock($file, LOCK_UN);
+  fclose($file);
+}
 
 foreach ($chat_hist as $key => $value) {
   $htmlElement .= "
@@ -70,6 +88,7 @@ foreach ($chat_hist as $key => $value) {
   </div>
   <form action="./chat_room.php" method="POST">
     <input type="text" name="fileName" value="<?= $file_name ?>" hidden>
+    <input type="text" name="personality" value="<?= $personality ?>" hidden>
     <input type="text" name="userName" value='<?= $user_name ?>'>
     <input type="text" name="text" value="">
     <input type="submit" value="Send">

@@ -27,6 +27,7 @@ if ($room_files) {
     <form action='./chat_room.php' method='POST'>
     <input type='text' name='fileName' value='{$room_obj["fileName"]}' hidden>
     <input type='text' name='userName' value='{$my_personality}' hidden>
+    <input type='text' name='personality' value='{$my_personality}' hidden>
     <td>$Chimpanzee</td>
     <td>$Orangutan</td>
     <td>$Human</td>
