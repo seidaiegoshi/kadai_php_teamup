@@ -94,7 +94,7 @@ if (!empty($_POST)) {
               `
             });
 
-            console.log(htmlElement);
+            // console.log(htmlElement);
             $('ul').html(htmlElement);
           },
           function() {
