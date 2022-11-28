@@ -66,7 +66,8 @@ if ($room_files) {
 
 <body>
   <div>
-    <a href="./create_chat_room.php">新規作成</a>
+    <!-- <a id="new_room" href="./create_chat_room.php">新規作成</a> -->
+    <button id="new_room">新規作成</button>
   </div>
   <table>
     <tr>
@@ -81,6 +82,15 @@ if ($room_files) {
     <?= $htmlElement ?>
   </table>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script>
+    $("#new_room").on("click", () => {
+      $.ajax({
+        url: "./create_chat_room.php",
+        type: 'POST',
+        data: "",
+      });
+    })
+  </script>
 </body>
 
 </html>

@@ -1,24 +1,23 @@
 <?php
-// var_dump($_POST);
 
-$file_name = $_POST["fileName"];
-$file_path  = "./data/" . $file_name;
-$user_name = $_POST['userName'];
 $htmlElement = "";
-$personality = $_POST['personality'];
+// ルームに入った、初回のみ、POSTを使う。
+//更新はajaxを使う。
+if (!empty($_POST)) {
+  $file_name = $_POST["fileName"];
+  $file_path  = "./data/" . $file_name;
+  $user_name = $_POST['userName'];
 
-if (isset($_POST["text"])) {
-  // $_POST["text"]があるか
-  if ($_POST["text"] != "") {
-    // $_POST["text"]があったとき、空かどうか
-    $json =
-      json_decode(file_get_contents($file_path), true);
+  $personality = $_POST['personality'];
 
-    $json[$personality] = $user_name;
-    $add_obj = ["name" => $_POST["userName"], "text" => $_POST["text"]];
-    // var_dump($add_obj);
-    array_push($json["chat"], $add_obj);
+  $file_size = filesize($file_path);
 
+  $json =
+    json_decode(file_get_contents($file_path), true);
+
+  //初回表示で$json[$personality]が空だったら、入力
+  if ($json[$personality] == "") {
+    $json[$personality] = $personality;
     $file = fopen($file_path, "r+");
     flock($file, LOCK_EX);
     file_put_contents($file_path, '');
@@ -27,40 +26,6 @@ if (isset($_POST["text"])) {
     flock($file, LOCK_UN);
     fclose($file);
   }
-}
-
-
-
-// テキストがなかったら読み込みだけを行う。
-$json =
-  json_decode(file_get_contents($file_path), true);
-
-
-
-$chat_hist = $json["chat"];
-// echo '<pre>';
-// var_dump($json["chat"]);
-// echo '</pre>';
-
-
-//初回表示で$json[$personality]が空だったら、入力
-if ($json[$personality] = "") {
-  $json[$personality] = $personality;
-  $file = fopen($file_path, "r+");
-  flock($file, LOCK_EX);
-  file_put_contents($file_path, '');
-
-  fwrite($file, json_encode($json));
-  flock($file, LOCK_UN);
-  fclose($file);
-}
-
-foreach ($chat_hist as $key => $value) {
-  $htmlElement .= "
-        <li>
-          <span class='name'>{$value["name"]}</span>
-          <span class='text'>{$value["text"]}</span>
-        </li>";
 }
 
 
@@ -86,14 +51,61 @@ foreach ($chat_hist as $key => $value) {
       <?= $htmlElement ?>
     </ul>
   </div>
-  <form action="./chat_room.php" method="POST">
+  <div id="#messageTextBox"></div>
+  <form action="./chat_update.php" method="POST">
     <input type="text" name="fileName" value="<?= $file_name ?>" hidden>
     <input type="text" name="personality" value="<?= $personality ?>" hidden>
-    <input type="text" name="userName" value='<?= $user_name ?>'>
+    <input type="text" name="userName">
     <input type="text" name="text" value="">
-    <input type="submit" value="Send">
+    <button type="submit">Send</button>
   </form>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script>
+    if ("<?= isset($file_name) ?>" !== "") {
+      let t_file_name = `<?= $file_name ?>`;
+      let t_user_name = `<?= $user_name ?>`;
+      sessionStorage.setItem('file_name', t_file_name);
+      sessionStorage.setItem('user_name', t_user_name);
+    }
+    const file_name = sessionStorage.getItem("file_name");
+    const user_name = sessionStorage.getItem("user_name");
+
+    $("[name='fileName']").val(file_name);
+    $("[name='userName']").val(user_name);
+
+
+    // ajaxで受信し続ける。携帯だと通信量やばくなりそう。。。こんなもんなんかな？
+    function readMessage() {
+      $.ajax({
+          type: 'post',
+          url: "./data/" + file_name,
+        })
+        .then(
+          function(data) {
+            // console.log(JSON.parse(data));
+            let htmlElement = "";
+            JSON.parse(data).chat.forEach(element => {
+              // console.log(element);
+              htmlElement += `
+                <li>
+                  <span class='name'>${element["name"]}</span>
+                  <span class='text'>${element["text"]}</span>
+                </li>
+              `
+            });
+
+            console.log(htmlElement);
+            $('ul').html(htmlElement);
+          },
+          function() {
+            alert("読み込み失敗");
+          }
+        );
+    }
+
+    readMessage();
+    setInterval(readMessage, 1000);
+  </script>
 </body>
 
 </html>

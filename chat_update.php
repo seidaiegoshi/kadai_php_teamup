@@ -4,7 +4,7 @@ echo "<pre>";
 var_dump($_POST);
 echo "</pre>";
 
-$user_name = $_POST['name'];
+$user_name = $_POST['userName'];
 $file_name = $_POST["fileName"];
 $file_path  = "./data/" . $file_name;
 // $write_data = "{$_POST['test']}";
@@ -18,7 +18,7 @@ echo "</pre>";
 
 
 
-$add_obj = ["name" => $_POST["name"], "text" => $_POST["text"]];
+$add_obj = ["name" => $user_name, "text" => $_POST["text"]];
 // echo "<pre>";
 // var_dump($add_obj);
 // echo "</pre>";
@@ -39,7 +39,7 @@ fwrite($file, json_encode($json));
 flock($file, LOCK_UN);
 fclose($file);
 
-
+// exit();
 
 // 掲示板の名前が必要なので、POSTで戻る。
 // $url = './chat_room.php';
@@ -61,6 +61,5 @@ fclose($file);
 // //var_dump($http_response_header);
 
 // echo $html;
-echo "Location:./chat_room.php?fileName={$file_name}";
 
-header("Location:./chat_room.php?fileName={$file_name}&userName={$user_name}");
+header("Location:./chat_room.php");

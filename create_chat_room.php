@@ -16,8 +16,6 @@ $jsonObj = [
   "chat" => []
 ];
 
-
-
 $file = fopen("./data/{$file_name}", "w");
 flock($file, LOCK_EX);
 
