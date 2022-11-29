@@ -21,3 +21,18 @@ header a {
 	padding-left: 20px;
 	font-size: 2rem;
 }
+
+table {
+	display: table;
+	border-collapse: separate;
+	border-spacing: 15px;
+}
+
+#chatLog {
+	width: 80%;
+	height: 50vh;
+	overflow: auto;
+	border: #ccc 2px solid;
+	border-radius: 5px;
+	padding: 8px;
+}

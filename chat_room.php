@@ -1,5 +1,4 @@
 <?php
-
 $htmlElement = "";
 // ルームに入った、初回のみ、POSTを使う。
 //更新はajaxを使う。
@@ -27,8 +26,6 @@ if (!empty($_POST)) {
     fclose($file);
   }
 }
-
-
 ?>
 
 <!DOCTYPE html>
@@ -46,21 +43,22 @@ if (!empty($_POST)) {
 </header>
 
 <body>
-  <div>
+  <div id="chatLog">
     <ul>
       <?= $htmlElement ?>
     </ul>
   </div>
-  <div id="#messageTextBox"></div>
   <form action="./chat_update.php" method="POST">
     <input type="text" name="fileName" value="<?= $file_name ?>" hidden>
     <input type="text" name="personality" value="<?= $personality ?>" hidden>
-    <input type="text" name="userName">
-    <input type="text" name="text" value="">
+    <input type="text" name="userName" id="userName">
+    <input type="text" name="text" id="inputText" value="">
     <button type="submit">Send</button>
   </form>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script>
+    $("#inputText").focus();
+
     if ("<?= isset($file_name) ?>" !== "") {
       let t_file_name = `<?= $file_name ?>`;
       let t_user_name = `<?= $user_name ?>`;
@@ -73,9 +71,13 @@ if (!empty($_POST)) {
     $("[name='fileName']").val(file_name);
     $("[name='userName']").val(user_name);
 
+    $("#userName").on("input", () => {
+      sessionStorage.setItem('user_name', $("#userName").val());
+    })
 
     // ajaxで受信し続ける。携帯だと通信量やばくなりそう。。。こんなもんなんかな？
     function readMessage() {
+
       $.ajax({
           type: 'post',
           url: "./data/" + file_name,
@@ -88,14 +90,18 @@ if (!empty($_POST)) {
               // console.log(element);
               htmlElement += `
                 <li>
-                  <span class='name'>${element["name"]}</span>
+                <p>
+                  <span class='name'>${element["name"]}</span>:
                   <span class='text'>${element["text"]}</span>
+                  </p>
                 </li>
               `
             });
 
             // console.log(htmlElement);
             $('ul').html(htmlElement);
+            $("#chatLog")[0].scrollTop = $("#chatLog")[0].scrollHeight;
+
           },
           function() {
             alert("読み込み失敗");
@@ -104,6 +110,8 @@ if (!empty($_POST)) {
     }
 
     readMessage();
+
+
     setInterval(readMessage, 1000);
   </script>
 </body>

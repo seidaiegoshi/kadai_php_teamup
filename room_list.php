@@ -1,7 +1,7 @@
 <?php
 // var_dump($_POST["personality"]);
 
-$my_personality = $_POST["personality"];
+$my_personality = $_GET["personality"];
 
 // jsonファイルを取得
 $room_files = glob('./data/*.json');
@@ -16,11 +16,11 @@ if ($room_files) {
     // var_dump($room_obj);
     // echo ($room_obj['roomName']);
 
-    $Chimpanzee = $room_obj["Chimpanzee"] ? "●" : "";
-    $Orangutan = $room_obj["Orangutan"] ? "●" : "";;
-    $Human = $room_obj["Human"] ? "●" : "";;
-    $Gorilla = $room_obj["Gorilla"] ? "●" : "";;
-    $Bonobo = $room_obj["Bonobo"] ? "●" : "";;
+    $Chimpanzee = $room_obj["Chimpanzee"] ? "ｳﾎ" : "-";
+    $Orangutan = $room_obj["Orangutan"] ? "ｳﾎ" : "-";;
+    $Human = $room_obj["Human"] ? "ｳﾎ" : "-";;
+    $Gorilla = $room_obj["Gorilla"] ? "ｳﾎ" : "-";;
+    $Bonobo = $room_obj["Bonobo"] ? "ｳﾎ" : "-";;
 
     $htmlElement .= "
     <tr>
@@ -66,8 +66,16 @@ if ($room_files) {
 
 <body>
   <div>
-    <!-- <a id="new_room" href="./create_chat_room.php">新規作成</a> -->
-    <button id="new_room">新規作成</button>
+    <p>
+      空いている部屋に入るとチャットスタート。
+    </p>
+    <p>部屋がない場合は新規作成を行う。</p>
+  </div>
+  <div>
+    <form action="./create_chat_room.php" method="GET">
+      <input type="text" name="personality" value="<?= $my_personality ?>" hidden>
+      <button id="new_room">新規作成</button>
+    </form>
   </div>
   <table>
     <tr>
@@ -82,15 +90,6 @@ if ($room_files) {
     <?= $htmlElement ?>
   </table>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <script>
-    $("#new_room").on("click", () => {
-      $.ajax({
-        url: "./create_chat_room.php",
-        type: 'POST',
-        data: "",
-      });
-    })
-  </script>
 </body>
 
 </html>

@@ -1,6 +1,8 @@
 <?php
 // UUID名でjsonファイルを作成
-var_dump(uniqid());
+
+$my_personality = $_GET["personality"];
+// var_dump($my_personality);
 
 $uniqid = uniqid();
 $file_name = "{$uniqid}.json";
@@ -23,3 +25,6 @@ fwrite($file, json_encode($jsonObj));
 
 flock($file, LOCK_UN);
 fclose($file);
+
+// exit();
+header("Location:./room_list.php?personality=$my_personality");
